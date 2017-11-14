@@ -1,5 +1,5 @@
 /**
- * Copyright 2015-2016 The OpenZipkin Authors
+ * Copyright 2015-2017 The OpenZipkin Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -21,9 +21,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import zipkin.storage.StorageComponent;
-import zipkin.storage.cassandra3.Cassandra3Storage;
-import zipkin.storage.cassandra3.Cassandra3Storage.SessionFactory;
+import zipkin.internal.V2StorageComponent;
+import zipkin2.storage.StorageComponent;
+import zipkin2.storage.cassandra.CassandraStorage;
 
 /**
  * This storage accepts Cassandra logs in a specified category. Each log entry is expected to contain
@@ -40,13 +40,20 @@ public class ZipkinCassandra3StorageAutoConfiguration {
 
   @Autowired(required = false)
   @Qualifier("tracingSessionFactory")
-  SessionFactory tracingSessionFactory;
+  CassandraStorage.SessionFactory tracingSessionFactory;
 
-  @Bean StorageComponent storage(ZipkinCassandra3StorageProperties properties,
-      @Value("${zipkin.storage.strict-trace-id:true}") boolean strictTraceId) {
-    Cassandra3Storage.Builder builder = properties.toBuilder().strictTraceId(strictTraceId);
-    return tracingSessionFactory == null
-        ? builder.build()
-        : builder.sessionFactory(tracingSessionFactory).build();
+  @Bean
+  @ConditionalOnMissingBean
+  V2StorageComponent storage(ZipkinCassandra3StorageProperties properties,
+    @Value("${zipkin.storage.strict-trace-id:true}") boolean strictTraceId) {
+    CassandraStorage.Builder builder = properties.toBuilder().strictTraceId(strictTraceId);
+    CassandraStorage result = tracingSessionFactory == null
+      ? builder.build()
+      : builder.sessionFactory(tracingSessionFactory).build();
+    return V2StorageComponent.create(result);
+  }
+
+  @Bean CassandraStorage v2Storage(V2StorageComponent component) {
+    return (CassandraStorage) component.delegate();
   }
 }

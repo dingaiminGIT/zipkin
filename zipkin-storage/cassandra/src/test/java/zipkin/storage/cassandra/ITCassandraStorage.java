@@ -15,14 +15,17 @@ package zipkin.storage.cassandra;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
+import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
 import static zipkin.storage.cassandra.SessionFactory.Default.buildCluster;
 
 @RunWith(Enclosed.class)
@@ -30,7 +33,7 @@ public class ITCassandraStorage {
 
   @ClassRule
   public static LazyCassandraStorage storage =
-    new LazyCassandraStorage("openzipkin/zipkin-cassandra:2.2.0", "test_zipkin");
+    new LazyCassandraStorage("openzipkin/zipkin-cassandra:2.2.2", "test_zipkin");
 
   public static class DependenciesTest extends CassandraDependenciesTest {
     @Override protected CassandraStorage storage() {

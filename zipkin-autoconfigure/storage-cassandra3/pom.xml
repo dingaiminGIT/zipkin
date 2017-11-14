@@ -20,7 +20,7 @@
   <parent>
     <groupId>io.zipkin.java</groupId>
     <artifactId>zipkin-autoconfigure</artifactId>
-    <version>2.2.2-SNAPSHOT</version>
+    <version>2.3.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>zipkin-autoconfigure-storage-cassandra3</artifactId>
@@ -33,14 +33,12 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>zipkin-storage-cassandra3</artifactId>
+      <artifactId>zipkin</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>io.zipkin.brave</groupId>
-      <artifactId>brave-core</artifactId>
-      <version>${brave.version}</version>
-      <optional>true</optional>
+      <groupId>io.zipkin.zipkin2</groupId>
+      <artifactId>zipkin-storage-cassandra</artifactId>
     </dependency>
   </dependencies>
 </project>
